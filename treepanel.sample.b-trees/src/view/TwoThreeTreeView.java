@@ -19,7 +19,7 @@ import javax.swing.JTextField;
 import model.DataNode;
 import model.KeyNode;
 import model.Node;
-import model.Node.IntermediateResult;
+import model.Interruptable.IntermediateResult;
 import model.Tree;
 import model.Tree.Action;
 import model.Tree.ActionResult;
@@ -126,6 +126,8 @@ public class TwoThreeTreeView extends JFrame implements Observer{
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				treePanel.clearNodeColor();
+				Node.setStepping(false);
+
 				String value = JOptionPane.showInputDialog(TwoThreeTreeView.this, "Neue Schlüssel");
 				if(value == null)
 					return;
@@ -156,6 +158,8 @@ public class TwoThreeTreeView extends JFrame implements Observer{
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				treePanel.clearNodeColor();
+				Node.setStepping(false);
+				
 				JTextField input = new JTextField();
 				Object[] messages = {"Schlüssel", input};
 				JOptionPane option = new JOptionPane(messages, JOptionPane.QUESTION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, Options.values());
@@ -174,8 +178,8 @@ public class TwoThreeTreeView extends JFrame implements Observer{
 	               	return;
 				}
 				
-				Node.setStepping(false);
-					String data = (char)('A' + key) + "";
+				
+				String data = (char)('A' + key) + "";
 				boolean ok;
 				
 				switch(value){

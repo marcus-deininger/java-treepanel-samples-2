@@ -1,20 +1,10 @@
 package model;
 
+import java.util.Observable;
+
 import trees.annotations.Ignore;
 
-public abstract class Node{
-	
-	public class IntermediateResult{
-		public String message;
-		public Node node;
-		public IntermediateResult(String message, Node node) {
-			this.message = message; this.node = node;
-		}
-		@Override
-		public String toString() {
-			return message + ": " + node.getClass().getSimpleName() + " " + node.toString();
-		}
-	}
+public abstract class Node extends Interruptable{
 	
 	@Ignore
 	private Node parent;
@@ -75,45 +65,17 @@ public abstract class Node{
 	public void updateMax() {
 		// do nothing
 	}
-	
-	// Notification //////////////////////////////////////////
-	
-	protected void notifyObservers(Object argument){
-		parent.notifyObservers(argument);
-	}
-	
-	// Synchronization //////////////////////////////////////////
-	
-	private static boolean stepping = false;
-	protected boolean suspended = false;
-	
-	protected void breakpoint(String message, Node node) {
-		if(!stepping)
-			return;
+
+	// Notification &  Synchronization //////////////////////////
 		
-		suspended = true; // set yourself on waiting
-		this.notifyObservers(new IntermediateResult(message, node));
-		
-		synchronized(this){
-			while(suspended)
-				try {
-					this.wait();
-				} catch (InterruptedException e) {}
-		}
+	@Override
+	protected Observable[] getSenders() {
+		Observable[] senders = { parent };
+		return senders;
 	}
 
-	public synchronized void resume(){
-		if(suspended){
-			suspended = false;
-			this.notifyAll();
-	    }
-		
-		for(Node node : this.getChildren())
-			node.resume();
+	@Override
+	protected Interruptable[] getReceivers() {
+		return this.getChildren();
 	}
-
-	public static void setStepping(boolean stepping) {
-		Node.stepping = stepping;
-	}
-
 }

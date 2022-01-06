@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Observable;
+
 public class RootHolder extends Node {
 	
 	private Tree tree;
@@ -74,23 +76,21 @@ public class RootHolder extends Node {
 			return "root";
 	}
 	
-	// Notification //////////////////////////////////////////
+	// Notification &  Synchronization //////////////////////////
 	
 	@Override
-	protected void notifyObservers(Object argument){
-		tree.notifyObservers(argument);
+	protected Observable[] getSenders() {
+		Observable[] senders = { tree };
+		return senders;
 	}
-	
-	// Synchronization //////////////////////////////////////////
-	
+
 	@Override
-	public synchronized void resume() {
-		if(suspended){
-			suspended = false;
-			this.notifyAll();
-	    }
-		if(root != null)
-			root.resume();
+	protected Interruptable[] getReceivers() {
+		if(root == null)
+			return new Interruptable[0];
+		else{
+			Interruptable[] receivers = { root };
+			return receivers;
+		}
 	}
-	
 }
