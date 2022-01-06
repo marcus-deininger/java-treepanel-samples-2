@@ -19,10 +19,10 @@ import javax.swing.JTextField;
 import model.DataNode;
 import model.KeyNode;
 import model.Node;
-import model.Interruptable.IntermediateResult;
 import model.Tree;
-import model.Tree.Action;
-import model.Tree.ActionResult;
+import synchronization.Synchronizable.ActionResult;
+import synchronization.Interruptable.IntermediateResult;
+import trees.panel.FontPanel;
 import trees.panel.TreePanel;
 import trees.panel.style.Alignment;
 import trees.panel.style.Shape;
@@ -106,7 +106,8 @@ public class TwoThreeTreeView extends JFrame implements Observer{
 			buttons.add(addButton);
 			buttons.add(nextButton);
 			buttons.add(searchButton);
-			buttons.add(clearButton);		
+			buttons.add(clearButton);
+			buttons.add(new FontPanel(treePanel.getStyle()));
 			control.add(buttons, BorderLayout.NORTH);
 	
 			JScrollPane scrollPane = new JScrollPane(console,
@@ -201,8 +202,7 @@ public class TwoThreeTreeView extends JFrame implements Observer{
 						console.setText("");
 						Node.setStepping(true);
 						updateButtons(true);
-						tree.setAction(Action.ADD);
-						tree.setKeyAndData(key, data);
+						tree.setAction("add", key, data);
 						Thread host = new Thread(tree);
 						host.start();
 						break;
@@ -271,30 +271,30 @@ public class TwoThreeTreeView extends JFrame implements Observer{
 	}
 
 	private void update(IntermediateResult result) {
-		treePanel.setNodeColor(Color.RED, result.node);
+		treePanel.setNodeColor(Color.RED, result.source);
 		console.append(result + "\n");
 	}
 
 	private void update(ActionResult result) {
 		updateButtons(false);
-		switch(result.action){
-			case NONE: break;
-			case ADD: 
-				if(!result.added){
-					JOptionPane.showMessageDialog(TwoThreeTreeView.this, 
-							"Element konnte nicht eingetragen werden", 
-							"Neuer Schlüssel", JOptionPane.PLAIN_MESSAGE);
-					return;
-				}
-				if(treePanel.getTree() != result.root)
-					treePanel.setTree(result.root);
-				break;
-			case CLEAR:
-				break;
-			case GET_ROOT:
-				break;
-			case SEARCH:
-				break;
+		if(!result.succeeded){
+			JOptionPane.showMessageDialog(TwoThreeTreeView.this, 
+					"Fehler bei der Ausführung von '" + result.action + "'", 
+					"Fehler", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+			
+		if(result.action.equals("add")){
+			// only this action is asynchronous so far 
+			boolean added = (boolean) result.returned;
+			if(!added){
+				JOptionPane.showMessageDialog(TwoThreeTreeView.this, 
+						"Element konnte nicht eingetragen werden", 
+						"Neuer Schlüssel", JOptionPane.PLAIN_MESSAGE);
+				return;
+			}
+			if(treePanel.getTree() != tree.getRoot())
+				treePanel.setTree(tree.getRoot());
 		}
 	}
 

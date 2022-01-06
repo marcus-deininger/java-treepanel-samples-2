@@ -2,6 +2,8 @@ package model;
 
 import java.util.Observable;
 
+import synchronization.Interruptable;
+
 public class RootHolder extends Node {
 	
 	private Tree tree;
@@ -80,17 +82,14 @@ public class RootHolder extends Node {
 	
 	@Override
 	protected Observable[] getSenders() {
-		Observable[] senders = { tree };
-		return senders;
+		return new Observable[]{ tree };
 	}
 
 	@Override
 	protected Interruptable[] getReceivers() {
 		if(root == null)
 			return new Interruptable[0];
-		else{
-			Interruptable[] receivers = { root };
-			return receivers;
-		}
+		else
+			return new Interruptable[]{ root };
 	}
 }

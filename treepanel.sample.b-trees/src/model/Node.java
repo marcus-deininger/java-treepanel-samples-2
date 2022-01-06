@@ -2,6 +2,7 @@ package model;
 
 import java.util.Observable;
 
+import synchronization.Interruptable;
 import trees.annotations.Ignore;
 
 public abstract class Node extends Interruptable{
@@ -70,8 +71,7 @@ public abstract class Node extends Interruptable{
 		
 	@Override
 	protected Observable[] getSenders() {
-		Observable[] senders = { parent };
-		return senders;
+		return new Observable[]{ parent };
 	}
 
 	@Override

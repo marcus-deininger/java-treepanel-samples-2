@@ -1,4 +1,4 @@
-package model;
+package synchronization;
 
 import java.util.Observable;
 
@@ -6,13 +6,13 @@ public abstract class Interruptable extends Observable{
 
 	public class IntermediateResult{
 		public String message;
-		public Node node;
-		public IntermediateResult(String message, Node node) {
-			this.message = message; this.node = node;
+		public Object source;
+		public IntermediateResult(String message, Object source) {
+			this.message = message; this.source = source;
 		}
 		@Override
 		public String toString() {
-			return message + ": " + node.getClass().getSimpleName() + " " + node.toString();
+			return message + ": " + source.getClass().getSimpleName() + " " + source.toString();
 		}
 	}
 	
@@ -28,20 +28,21 @@ public abstract class Interruptable extends Observable{
 		Observable[] senders = this.getSenders();
 		if(senders != null)
 			for(Observable sender : senders)
-				if(sender != null)
+				if(sender != null){
 					sender.notifyObservers(argument);
+				}
 	}
 		
 	// Synchronization //////////////////////////////////////////
 	
 	protected abstract Interruptable[] getReceivers();
 
-	protected final void breakpoint(String message, Node node) {
+	protected final void breakpoint(String message, Object source) {
 		if(!stepping)
 			return;
 		
 		suspended = true; // set yourself on waiting
-		this.notifyObservers(new IntermediateResult(message, node));
+		this.notifyObservers(new IntermediateResult(message, source));
 		
 		synchronized(this){
 			while(suspended)
