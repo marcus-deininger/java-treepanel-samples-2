@@ -89,6 +89,8 @@ public class KeyNode extends Node {
 	}
 	
 	public void insert(Node n){
+		this.breakpoint("Insert Node", n);
+		
 		if(right == null)	// Slot frei --> einfügen
 			enter(n);
 		else				// kein Slot frei --> teilen
@@ -97,6 +99,8 @@ public class KeyNode extends Node {
 
 
 	private void enter(Node n) {
+		this.breakpoint("Entering at", this);
+		
 		// Slot frei --> einfügen
 		int nMax = n.getSubtreeMax();
 		
@@ -113,6 +117,8 @@ public class KeyNode extends Node {
 
 	private void split(Node n) {
 		//kein Slot frei --> teilen!
+
+		this.breakpoint("Splitting", this);
 
 		int nMax = n.getSubtreeMax();
 		KeyNode k;
@@ -143,6 +149,9 @@ public class KeyNode extends Node {
 			subtreeMax = right.getSubtreeMax();
 		else
 			subtreeMax = middleMax;
+
+		this.breakpoint("Updated max", this);
+
 		if(this.getParent() != null)
 			this.getParent().updateMax();
 	}
